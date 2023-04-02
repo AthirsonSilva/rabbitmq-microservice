@@ -1,28 +1,35 @@
 package microservice.orderservice.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class RabbitMQConfig {
-    @Value("${rabbitmq.queue.order.name}")
-    private String queueName;
-    @Value("${rabbitmq.exchange.order.name}")
+    @Value("${rabbitmq.order.queue}")
+    private String queue;
+    @Value("${rabbitmq.order.exchange}")
     private String exchange;
-    @Value("${rabbitmq.routing-key.order.name}")
+    @Value("${rabbitmq.order.routingKey}")
     private String routingKey;
+
+    private RabbitMQProperties properties;
 
     @Bean
     public Queue orderQueue() {
-        return new Queue(queueName, true); // Create queue with name
+        return new Queue(queue, true); // Create queue with name
     }
 
     @Bean
@@ -41,8 +48,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate() {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(); // Create rabbit template to send message to queue
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory); // Create rabbit template to send message to queue
         rabbitTemplate.setMessageConverter(jsonMessageConverter()); // Set message converter to rabbit template to convert message to json
 
         return rabbitTemplate;
