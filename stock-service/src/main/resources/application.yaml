@@ -1,0 +1,20 @@
+spring:
+  rabbitmq:
+    password: admin
+    port: 5672
+    host: localhost
+    username: admin
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/order-events
+      database: order-events
+      username: root
+      password: '@Potter77'
+
+rabbitmq:
+  queue:
+    order:
+      name: order-queue
+server:
+  port: 8081
